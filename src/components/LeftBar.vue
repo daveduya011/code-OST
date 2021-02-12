@@ -78,7 +78,8 @@ export default {
       }
 
       this.question.question = this.trimAll(this.question.question);
-      this.question.answer = this.trimAll(this.question.answer)
+      this.question.answer = this.trimAll(this.question.answer);
+      this.question.question_lowercase = this.question.question.toLowerCase();
 
       this.warningEmpty = false;
       //if has key, then update
@@ -105,7 +106,7 @@ export default {
       if (this.question.key)
         return;
 
-      let question = this.trimAll(this.question.question);
+      let question = this.trimAll(this.question.question).toLowerCase();
       let questionFound = '';
 
       if (question === '') {
@@ -115,7 +116,7 @@ export default {
 
 
       let collection = this.store.getQuestions();
-      let query = await collection.where('question', '==', question).get();
+      let query = await collection.where('question_lowercase', '==', question).get();
 
       query.forEach(result => {
         questionFound = result.data();

@@ -13,12 +13,22 @@ export const store = reactive({
         if (project.exists) {
             store.isExistingProject = true;
             store.projectName = project.data().projectName;
+            document.title = store.projectName;
         }
         store.isLoading = false;
         return project;
     },
     getProject : () => {
-        return db.collection('Projects').doc(store.projectID)
+        return store.getProjects().doc(store.projectID)
+    },
+    getProjects : () => {
+        return db.collection('Projects');
+    },
+    addProject: async (name) => {
+        let url = name.replace(/\s+/g, '-').toLowerCase();
+        return await store.getProjects().doc(url).set({
+            name: name
+        })
     },
     getQuestions : () => {
       return store.getProject().collection('Questions');
@@ -29,6 +39,13 @@ export const store = reactive({
     changeQuestion : (question) => {
         store.question = question;
         return question;
+    },
+    reset: ()=>{
+        store.projectID = null;
+        store.projectName = '';
+        store.isExistingProject = false;
+        store.isLoading = true;
+        store.question = null;
     }
 });
 

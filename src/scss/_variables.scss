@@ -3,8 +3,10 @@
 $font-family-sans-serif: Poppins !default;
 
 $container-padding-x: 0;
+$header-height: 85px;
 
 $primary: #5f2eea !default;
+$primary-light: #bea9fc !default;
 $secondary:     #1CC8EE !default;
 $success:       #00BA88 !default;
 $success-light:       #34EAB9 !default;
@@ -81,6 +83,35 @@ input[type=text].form-control {
     .modal-header {
       padding: 25px 25px 10px 25px;
       border: none;
+    }
+  }
+}
+
+.list {
+  text-align: center;
+  position: relative;
+
+  .list-item {
+    background: #fff;
+    font-size: 14px;
+    border-radius: 32px;
+    border: none;
+    margin: 10px 20px;
+    cursor: pointer;
+    user-select: none;
+    animation: bounce-in 0.5s ease-out;
+    padding: 30px 30px;
+    transition: transform 0.1s ease-in;
+    word-break: break-word;
+
+
+    &:hover {
+      transform: scale(1.05, 1.05);
+      background: $color-input-background;
+    }
+
+    &.isActive {
+      background: $success-light;
     }
   }
 }

@@ -1,14 +1,21 @@
 <template>
-  <div id="nav">
-<!--    <router-link to="/">Home</router-link> |-->
-  </div>
+  <Header></Header>
   <router-view/>
 </template>
 
 <script>
 import { store } from "@/modules/store";
+import Header from "@/components/Header";
 export default {
-  provide: { store }
+  components: {Header},
+  provide: { store },
+  watch:{
+    '$route' (to){
+      if (to.fullPath === '/') {
+        store.reset();
+      }
+    }
+  }
 }
 </script>
 
@@ -16,18 +23,15 @@ export default {
 html {
   min-height: 100%;
   position: relative;
+  overflow: hidden;
 }
 html,body, #app {
   height: 100%;
 }
 
 .project {
-  position:absolute;
-  top:0;
-  bottom:0;
-  left:0;
-  right:0;
-  overflow:hidden;
+  position:relative;
+  height: 100%;
 }
 
 

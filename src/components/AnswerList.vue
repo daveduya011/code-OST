@@ -13,7 +13,7 @@
     <div class="list">
       <div v-for="question in Questions"
            :key="question.key"
-           :class="['question-item','list-group-item','card-body', { isActive: activeQuestion === question }]"
+           :class="['list-item', 'card-body', { isActive: activeQuestion === question }]"
            @click="selectQuestion(question)"
       >
         <div class="question card-text">{{ question.question }}</div>
@@ -43,7 +43,8 @@ export default {
       this.Questions = [];
       snapshot.forEach(result => {
         this.Questions.push(result.data());
-      })
+      });
+
     })
   },
   methods : {
@@ -57,35 +58,19 @@ export default {
 
 <style scoped lang="scss">
 .answerList {
-  background: $color-background;
-  padding-bottom: 220px;
-}
-.list {
-  text-align: center;
   position: relative;
+  background: $color-background;
+  padding-bottom: 200px;
+}
+
+.list {
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 100%;
+  height: 100%;
 
-  .question-item {
-    background: $color-off-white;
-    font-size: 14px;
-    border-radius: 32px;
-    border: none;
-    margin: 10px 20px;
-    cursor: pointer;
-    user-select: none;
-    animation: bounce-in 0.5s ease-out;
-    padding: 30px 30px;
-    transition: transform 0.1s ease-in;
-
-    &:hover {
-      transform: scale(1.05, 1.05);
-      background: $color-input-background;
-    }
+  .list-item {
 
     &.isActive {
-      background: $success-light;
       .answer {
         color: $color-body;
       }
@@ -105,14 +90,12 @@ export default {
 @keyframes bounce-in {
   0% {
     transform: scale(0);
-    height: 0;
   }
   50% {
     transform: scale(1.1);
   }
   100% {
     transform: scale(1);
-    height: 100%;
   }
 }
 </style>

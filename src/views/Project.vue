@@ -1,6 +1,5 @@
 <template>
   <div class="project container-fluid" v-if="isExistingProject">
-      <Header></Header>
 
       <div class="h-100 row">
         <LeftBar class="col-xl-3 col-sm-6" @displayedQuestionChanged="displayedQuestionChanged"></LeftBar>
@@ -20,7 +19,6 @@
 
 <script>
 // @ is an alias to /src
-import Header from "@/components/Header";
 import LeftBar from "@/components/LeftBar";
 import AnswerList from "@/components/AnswerList";
 import QuestionDisplay from "@/components/QuestionDisplay";
@@ -36,7 +34,6 @@ export default {
     QuestionDisplay,
     AnswerList,
     LeftBar,
-    Header,
   },
   computed: {
     isExistingProject() {

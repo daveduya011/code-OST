@@ -4,7 +4,8 @@
     <div class="d-flex">
 
       <div class="p-0">
-        <div id="logo" class="">code-OST&lt;/&gt;</div>
+        <router-link to="/"><div id="logo" class="">code-OST&lt;/&gt;</div>
+        </router-link>
         <div id="author">{{ store.projectID ? store.getProjectName() : 'by TempestDevs'}}</div>
       </div>
 
@@ -36,6 +37,7 @@ export default {
 <style lang="scss" scoped>
 
 .header {
+  min-height: $header-height;
 }
 
 .project-progress {

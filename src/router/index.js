@@ -1,12 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Project from "@/views/Project";
 import FallBack from "@/views/FallBack";
+import Home from "@/views/Home";
+import { nextTick } from 'vue';
 
 const routes = [
   {
+    path: '/',
+    name: 'code-OST',
+    component: Home,
+    meta: {title: 'code-OST'}
+
+  },
+  {
     path: '/project/:projectID',
     name: 'Project',
-    component: Project
+    component: Project,
   },
   {
     path: '/about',
@@ -19,7 +28,8 @@ const routes = [
   {
     path: '/:pathMatch(.*)',
     name: 'FallBack',
-    component: FallBack
+    component: FallBack,
+    meta: {title: 'Maling page buddy'}
   }
 ]
 
@@ -27,5 +37,11 @@ const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
 })
+
+router.afterEach((to) => {
+  nextTick(() => {
+    document.title = to.meta.title || 'code-OST';
+  }).then();
+});
 
 export default router
