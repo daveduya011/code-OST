@@ -5,7 +5,7 @@
 
       <div class="p-0">
         <div id="logo" class="">code-OST&lt;/&gt;</div>
-        <div id="author">by TempestDevs</div>
+        <div id="author">{{ store.projectID ? store.getProjectName() : 'by TempestDevs'}}</div>
       </div>
 
       <div class="align-self-center ms-auto pe-4">
@@ -28,7 +28,8 @@
 
 <script>
 export default {
-  name: "Header"
+  name: "Header",
+  inject: ['store']
 }
 </script>
 
@@ -60,7 +61,7 @@ export default {
   color: $color-off-white;
   font-size: 18px;
   font-weight: bold;
-  border-radius: 0px 0px 32px 0px;
+  border-radius: 0 0 32px 0;
   background: $primary;
   width: 200px;
   padding: 20px 32px;

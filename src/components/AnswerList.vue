@@ -13,7 +13,7 @@
     <div class="list">
       <div v-for="question in Questions"
            :key="question.key"
-           :class="['question-item','list-group-item','card-body', { isActive: question.isActive }]"
+           :class="['question-item','list-group-item','card-body', { isActive: activeQuestion === question }]"
            @click="selectQuestion(question)"
       >
         <div class="question card-text">{{ question.question }}</div>
@@ -24,42 +24,33 @@
 </template>
 
 <script>
-import { db } from '@/firebaseDb';
 export default {
   name: "AnswerList",
   data() {
     return {
       Questions: [],
-      lastActiveQuestion: null
     }
   },
+  computed: {
+    activeQuestion() {
+      return this.store.question;
+    }
+  },
+  inject: ['store'],
   emits: ['displayedQuestionChanged'],
-  props: ['onQuestionChanged'],
   created() {
-    db.collection('Questions').orderBy("timestamp","desc").onSnapshot(snapshot => {
+    this.store.getQuestions().orderBy("timestamp","desc").onSnapshot(snapshot => {
       this.Questions = [];
       snapshot.forEach(result => {
-        this.Questions.push({
-          key: result.id,
-          question: result.data().question,
-          answer: result.data().answer
-        })
+        this.Questions.push(result.data());
       })
     })
   },
   methods : {
     selectQuestion(question){
-
-      this.$emit('displayedQuestionChanged', question);
-      question.isActive = true;
-      if (question !== this.lastActiveQuestion) this.unselectLastQuestion();
-      this.lastActiveQuestion = question;
-
-    },
-    unselectLastQuestion(){
-      if (this.lastActiveQuestion) this.lastActiveQuestion.isActive = false;
+      this.store.changeQuestion(question);
+      this.$emit('displayedQuestionChanged');
     }
-
   }
 }
 </script>
@@ -104,6 +95,10 @@ export default {
       margin-top: 6px;
       color: $success;
       font-weight: 600;
+    }
+
+    .answer, .question {
+      word-break: break-word;
     }
   }
 }

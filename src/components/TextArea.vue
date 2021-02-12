@@ -1,7 +1,7 @@
 <template>
   <textarea :value="modelValue"
+            ref="txtArea"
             @input="$emit('update:modelValue', $event.target.value)"
-            @scroll="onScroll"
             @submit="$emit('update:modelValue', modelValue?.trim())"
             class="form-control"></textarea>
 </template>
@@ -11,12 +11,15 @@ export default {
   name: "TextArea",
   props: ['modelValue'],
   emits: ['update:modelValue'],
+  updated() {
+    this.updateHeight();
+  },
   methods: {
-    onScroll(e) {
-      let element = e.target;
+    updateHeight() {
+      let element = this.$refs.txtArea;
       element.style.height = "auto";
-      element.style.height = `${element.scrollHeight}px`;
-    }
+      element.style.height = `${element.scrollHeight+8}px`;
+    },
   }
 }
 </script>

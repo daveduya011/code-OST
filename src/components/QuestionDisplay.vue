@@ -19,6 +19,8 @@
         <span>{{ displayedQuestion.question }}</span>
       </div>
       <div class="answer" ref="answerEl">
+        <div class="theAnswerIsTxt" v-if="displayedQuestion.isUnsure">MY GUESS IS</div>
+        <div class="theAnswerIsTxt" v-else>The answer is</div>
         <span>{{ displayedQuestion.answer }}
         </span>
         <button type="button" class="btn-edit btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -35,10 +37,16 @@
 import TextFill from 'textfilljs'
 import { ref, watchEffect, onBeforeUpdate } from 'vue'
 import EditAnswer from "@/components/EditAnswer";
+
 export default {
   name: "QuestionDisplay",
   components: {EditAnswer},
-  props: ['displayedQuestion'],
+  inject: ["store"],
+  computed: {
+    displayedQuestion() {
+      return this.store.question;
+    }
+  },
   methods: {
     showEditDialogue(){
       
@@ -107,17 +115,26 @@ export default {
     height: auto;
   }
 }
-
+.answer, .question {
+  word-break: break-word;
+}
 .answer {
   position: relative;
   background: $color-input-background;
   color: $color-body;
-  font-weight: normal;
-  border-radius: 0px 32px 32px 32px;
+  font-weight: 600;
+  border-radius: 0 32px 32px 32px;
   padding: 20px 65px 20px 20px;
   display: inline-block;
   max-height: 200px;
   min-width: 150px;
+
+  .theAnswerIsTxt {
+    font-size: 12px;
+    margin-bottom: 5px;
+    user-select: none;
+    color: $color-label;
+  }
 
   .btn-edit {
     font-size: 20px;
@@ -129,9 +146,6 @@ export default {
     border: none;
     line-height: 0.7;
   }
-  .edit-icon {
-
-  }
 }
 
 .not-answered {
@@ -139,15 +153,16 @@ export default {
 }
 
 .unsure {
+  .theAnswerIsTxt {
+    color: $error-lighter;
+  }
   .question {
     color: $error-dark;
     font-weight: normal;
   }
   .answer {
     background: $error;
-    font-weight: normal;
-    color: $color-off-white;
-
+    color: $white;
   }
   .alreadyAnsweredTxt {
     color: $color-label;

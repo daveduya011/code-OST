@@ -6,7 +6,10 @@
 </template>
 
 <script>
-
+import { store } from "@/modules/store";
+export default {
+  provide: { store }
+}
 </script>
 
 <style lang="scss">
@@ -14,11 +17,11 @@ html {
   min-height: 100%;
   position: relative;
 }
-html,body {
+html,body, #app {
   height: 100%;
 }
 
-.home {
+.project {
   position:absolute;
   top:0;
   bottom:0;

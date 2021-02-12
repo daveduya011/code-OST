@@ -1,7 +1,7 @@
 <template>
   <div class="leftBar">
 
-    <form @submit.prevent="onFormSubmit" autocomplete="false">
+    <form>
       <div class="form-group px-4 pt-4 pb-2">
         <label for="inputQuestion">Question</label>
         <TextArea class="form-control" id="inputQuestion" rows="3"
@@ -20,13 +20,19 @@
 
       <div class="d-flex mx-4 my-2 align-items-center">
         <div class="unsure-checkbox form-check">
-          <input class="form-check-input" type="checkbox" v-model="question.isUnsure" id="isUnsure">
-          <label class="form-check-label" for="isUnsure">
+          <input class="form-check-input" type="checkbox"
+                 v-model="question.isUnsure"
+                 :id="[question.key ? question.key + '_unsure' : 'unsure']">
+          <label class="form-check-label" :for="[question.key ? question.key + '_unsure' : 'unsure']">
             Mark unsure
           </label>
         </div>
 
-        <button type="submit" class="btn btn-primary d-flex ms-auto">Submit</button>
+        <button type="submit"
+                class="btn btn-primary d-flex ms-auto"
+                data-bs-dismiss="modal"
+                @click.prevent="onFormSubmit"
+        >Submit</button>
       </div>
     </form>
     <div class="alert-danger warning m-4" v-if="warningEmpty">
@@ -37,7 +43,6 @@
 
 <script>
 
-import { db } from '@/firebaseDb';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import TextArea from "@/components/TextArea";
@@ -56,53 +61,71 @@ export default {
       warningEmpty: false
     };
   },
-  props: {
-    msg: String
+  computed: {
+
   },
+  inject: ['store'],
   emits: ['displayedQuestionChanged'],
   methods: {
-    onFormSubmit() {
-      this.question.question = this.trimAll(this.question.question);
-      this.question.answer = this.trimAll(this.question.answer)
+    async onFormSubmit() {
+      let collection = this.store.getQuestions().doc();
+      let hasKey = false;
 
-      if (this.question.question === '' || this.question.answer === '') {
+
+      if (!this.question.question?.trim() || !this.question.answer?.trim()) {
         this.warningEmpty = true;
         return;
       }
 
+      this.question.question = this.trimAll(this.question.question);
+      this.question.answer = this.trimAll(this.question.answer)
+
       this.warningEmpty = false;
-      let collection = db.collection('Questions');
-      collection.add(this.question).then((ref) => {
-        ref.update({
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch((error) => {
-          console.log(error);
-        })
-        this.question = {}
+      //if has key, then update
+      if (this.question.key) {
+        collection = this.store.getQuestions().doc(this.question.key);
+        hasKey = true;
+      }
+
+      this.question.key = collection.id;
+      this.question.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+      collection.set(this.question, { merge:true }).then(()=>{
+        if (hasKey)
+          this.store.changeQuestion(this.question);
+
+        this.question = {};
         this.searched = 'none';
-      }).catch((error) => {
-        console.log(error);
       });
     },
+
     async onQuestionChanged(){
       this.warningEmpty = false;
+
+      if (this.question.key)
+        return;
+
       let question = this.trimAll(this.question.question);
       let questionFound = '';
 
       if (question === '') {
-        this.$emit('displayedQuestionChanged', null);
+        this.store.changeQuestion(null);
         return;
       }
 
-      let collection = db.collection('Questions');
+
+      let collection = this.store.getQuestions();
       let query = await collection.where('question', '==', question).get();
 
       query.forEach(result => {
         questionFound = result.data();
       })
+      this.store.changeQuestion(questionFound);
+      this.$emit('displayedQuestionChanged');
+    },
 
-
-      this.$emit('displayedQuestionChanged', questionFound);
+    setQuestion(question) {
+      this.question = question;
     },
 
     trimAll(text){
