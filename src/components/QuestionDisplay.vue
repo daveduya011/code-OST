@@ -23,7 +23,7 @@
         <div class="theAnswerIsTxt" v-else>The answer is</div>
         <span>{{ displayedQuestion.answer }}
         </span>
-        <button type="button" class="btn-edit btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button" class="btn-edit btn" @click="showEditModal">
           <i class="bi bi-pencil-square edit-icon"></i>
         </button>
       </div>
@@ -35,8 +35,11 @@
       </button>
     </div>
     <ConfirmDelete @confirmDelete="deleteQuestion"></ConfirmDelete>
-    <EditAnswer
+    <EditAnswer ref="editModal" @onSubmit="onEditSubmit"
         :question="displayedQuestion"></EditAnswer>
+    <QuestionIsChangedModal
+        ref="questionIsChangedModal"
+    ></QuestionIsChangedModal>
     </div>
 </template>
 
@@ -45,19 +48,50 @@ import TextFill from 'textfilljs'
 import { ref, watchEffect, onBeforeUpdate } from 'vue'
 import EditAnswer from "@/components/EditAnswer";
 import ConfirmDelete from "@/components/ConfirmDelete";
+import QuestionIsChangedModal from "@/components/QuestionIsChangedModal";
 
 export default {
   name: "QuestionDisplay",
-  components: {ConfirmDelete, EditAnswer},
+  components: {QuestionIsChangedModal, ConfirmDelete, EditAnswer},
+  data(){
+    return {
+      snapshot: null,
+      count: 0,
+      isYouEditing: false,
+    }
+  },
   inject: ["store"],
   computed: {
     displayedQuestion() {
+      this.questionChanged();
       return this.store.question;
     }
   },
   methods: {
     deleteQuestion(){
       this.store.deleteQuestion(this.displayedQuestion);
+    },
+    questionChanged(){
+      this.count = 0;
+      this.isYouEditing = false;
+      if (this.snapshot) this.snapshot();
+
+      this.snapshot = this.store.getQuestion().onSnapshot(data => {
+        if(data.exists) {
+          if(this.count > 0 ) {
+            this.store.changeQuestion(data.data());
+            if (!this.isYouEditing)
+              this.$refs.questionIsChangedModal.showModal();
+          }
+          this.count++;
+        }
+      })
+    },
+    showEditModal(){
+      this.$refs.editModal.show()
+    },
+    onEditSubmit(){
+      this.isYouEditing = true;
     }
   },
   setup(){

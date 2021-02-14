@@ -37,6 +37,9 @@ export const store = reactive({
     getQuestions : () => {
       return store.getProject().collection('Questions');
     },
+    getQuestion : () => {
+        return store.getQuestions().doc(store.question?.key);
+    },
     getProjectName : () => {
         return store.projectName;
     },

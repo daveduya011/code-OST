@@ -30,7 +30,6 @@
 
         <button type="submit"
                 class="btn btn-primary d-flex ms-auto"
-                data-bs-dismiss="modal"
                 @click.prevent="onFormSubmit"
         >Submit</button>
       </div>
@@ -61,11 +60,8 @@ export default {
       warningEmpty: false
     };
   },
-  computed: {
-
-  },
   inject: ['store'],
-  emits: ['displayedQuestionChanged'],
+  emits: ['displayedQuestionChanged', 'onSubmit'],
   methods: {
     async onFormSubmit() {
       let collection = this.store.getQuestions().doc();
@@ -97,6 +93,7 @@ export default {
         this.question = {};
         this.searched = 'none';
       });
+      this.$emit('onSubmit');
     },
 
     async onQuestionChanged(){
