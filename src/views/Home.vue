@@ -1,6 +1,6 @@
 <template>
   <div class="home p-5" v-show="!isLoading">
-    <div class="list row row-cols-lg-5 row-cols-sm-2 justify-content-center">
+    <div class="list row row-cols-1 row-cols-lg-5 row-cols-sm-3  justify-content-center">
       <div v-for="project in Projects"
            :key="project.id"
            :class="['list-item', 'col']"
@@ -59,8 +59,9 @@ export default {
   background: $color-background;
 }
 .list-item {
-  min-height: 120px;
+  min-height: 80px;
   box-shadow: 0 0 25px #eee;
+  padding: 20px !important;
 
   .projectName{
     height: 100%;
@@ -69,7 +70,8 @@ export default {
     width:100%;
     text-transform: uppercase;
     h1 {
-      display:table-cell; vertical-align:middle
+      display:table-cell; vertical-align:middle;
+      font-size: 14px;
     }
   }
 
@@ -88,8 +90,8 @@ export default {
     background: $color-off-white;
     max-width: 120px;
     i {
-      font-size: 30px;
-      line-height: 1.8em;
+      font-size: 26px;
+      line-height: 1.3em;
     }
   }
 }
