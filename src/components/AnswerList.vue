@@ -44,7 +44,6 @@ export default {
       snapshot.forEach(result => {
         this.Questions.push(result.data());
       });
-
     })
   },
   methods : {

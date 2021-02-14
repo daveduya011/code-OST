@@ -1,5 +1,6 @@
 import { reactive } from 'vue';
 import { db } from '@/firebaseDb'
+import firebase from "firebase/app";
 
 export const store = reactive({
     projectID: null,
@@ -24,11 +25,14 @@ export const store = reactive({
     getProjects : () => {
         return db.collection('Projects');
     },
-    addProject: async (name) => {
-        let url = name.replace(/\s+/g, '-').toLowerCase();
+    addProject: async (name, url) => {
         return await store.getProjects().doc(url).set({
-            name: name
+            projectName: name,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
+    },
+    deleteProject: () => {
+        store.getProject().delete();
     },
     getQuestions : () => {
       return store.getProject().collection('Questions');
@@ -39,6 +43,12 @@ export const store = reactive({
     changeQuestion : (question) => {
         store.question = question;
         return question;
+    },
+    deleteQuestion: (question) => {
+        let del = store.getQuestions().doc(question.key).delete();
+        del.then(() => {
+            store.changeQuestion(null);
+        });
     },
     reset: ()=>{
         store.projectID = null;

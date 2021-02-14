@@ -73,9 +73,9 @@ export default {
 
 #author {
   color: $color-off-white;
-  font-weight: 200;
   display: inline-block;
   margin-left: 20px;
+  font-weight: 600;
   @include media-breakpoint-down(md) {
     display: block;
     position: relative;

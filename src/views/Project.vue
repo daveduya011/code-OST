@@ -14,6 +14,7 @@
     </div>
     <Loading v-else-if="isLoading"></Loading>
     <FallBack v-else></FallBack>
+  <ConfirmDelete @confirmDelete="deleteProject" ref="deleteModal"></ConfirmDelete>
 
 </template>
 
@@ -24,11 +25,13 @@ import AnswerList from "@/components/AnswerList";
 import QuestionDisplay from "@/components/QuestionDisplay";
 import FallBack from "@/views/FallBack";
 import Loading from "@/views/Loading";
+import ConfirmDelete from "@/components/ConfirmDelete";
 
 export default {
   name: 'Project',
   inject: ["store"],
   components: {
+    ConfirmDelete,
     Loading,
     FallBack,
     QuestionDisplay,
@@ -48,8 +51,25 @@ export default {
   },
   methods: {
     displayedQuestionChanged(){
-      // this.$refs.refAnswerList.unselectLastQuestion();
+
+    },
+    deleteProject(){
+      this.store.deleteProject();
+      this.$router.push('/');
     }
+  },
+  mounted() {
+    this._keyListener = function(e) {
+      if (e.key === "Delete" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        this.$refs.deleteModal?.showModal();
+      }
+    };
+
+    document.addEventListener('keydown', this._keyListener.bind(this));
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this._keyListener);
   }
 }
 </script>

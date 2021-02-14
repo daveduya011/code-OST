@@ -1,54 +1,53 @@
 <template>
-  <div class="home p-5">
-    <div class="list row justify-content-center">
+  <div class="home p-5" v-show="!isLoading">
+    <div class="list row row-cols-lg-5 row-cols-sm-2 justify-content-center">
       <div v-for="project in Projects"
            :key="project.id"
-           :class="['list-item','card-body', 'col-sm-4']"
+           :class="['list-item', 'col']"
            @click="selectProject(project)"
       >
         <div class="projectName card-text"><h1>{{ project.data().projectName }}</h1></div>
       </div>
-      <div class="addButton list-item card-body col-sm-4"
+      <div class="addButton list-item"
            @click="addProject"
-      >+</div>
+      ><i class="bi bi-plus-circle"></i>
+      </div>
     </div>
-    <CreateProjectModal></CreateProjectModal>
+    <CreateProjectModal ref="modal"></CreateProjectModal>
   </div>
+  <Loading v-show="isLoading"></Loading>
+
 </template>
 
 <script>
-import CreateProjectModal from "@/views/CreateProjectModal";
-import Toast from 'bootstrap/js/dist/toast'
+import CreateProjectModal from "@/components/CreateProjectModal";
+import Loading from "@/views/Loading";
+
 export default {
   name: "Home",
-  components: {CreateProjectModal},
+  components: {Loading, CreateProjectModal},
   data() {
     return {
       Projects: [],
-      toast : null
+      isLoading: true
     }
   },
   inject: ['store'],
   created() {
-    this.store.getProjects().onSnapshot(snapshot => {
+    this.store.getProjects().orderBy("timestamp","asc").onSnapshot(snapshot => {
       this.Projects = [];
       snapshot.forEach(result => {
         this.Projects.push(result);
       });
+      this.isLoading = false;
     })
-  },
-  mounted(){
-    let toastEl = document.getElementById('createProjectModal');
-    this.toast = new Toast(toastEl, {
-      autohide: false
-    }); // No need for options; use the default options
   },
   methods : {
     selectProject(project){
       this.$router.push('/project/' + project.id)
     },
     addProject(){
-      this.toast.show();
+      this.$refs.modal.showModal();
     }
   }
 }
@@ -60,9 +59,19 @@ export default {
   background: $color-background;
 }
 .list-item {
-  max-width: 250px;
-  min-height: 100px;
+  min-height: 120px;
   box-shadow: 0 0 25px #eee;
+
+  .projectName{
+    height: 100%;
+    text-align:center;
+    display:table;
+    width:100%;
+    text-transform: uppercase;
+    h1 {
+      display:table-cell; vertical-align:middle
+    }
+  }
 
   h1 {
     font-weight: 600;
@@ -74,9 +83,14 @@ export default {
   }
 
   &.addButton {
-    font-weight: bold;
-    font-size: 30px;
-    background: $success-light;
+    font-weight: normal;
+    font-size: 20px;
+    background: $color-off-white;
+    max-width: 120px;
+    i {
+      font-size: 30px;
+      line-height: 1.8em;
+    }
   }
 }
 </style>

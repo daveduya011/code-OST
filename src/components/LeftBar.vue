@@ -44,8 +44,8 @@
 <script>
 
 import firebase from 'firebase/app';
-import 'firebase/firestore';
 import TextArea from "@/components/TextArea";
+import {trimAll} from "@/modules/methods";
 
 export default {
   name: "LeftBar",
@@ -71,14 +71,13 @@ export default {
       let collection = this.store.getQuestions().doc();
       let hasKey = false;
 
-
       if (!this.question.question?.trim() || !this.question.answer?.trim()) {
         this.warningEmpty = true;
         return;
       }
 
-      this.question.question = this.trimAll(this.question.question);
-      this.question.answer = this.trimAll(this.question.answer);
+      this.question.question = trimAll(this.question.question);
+      this.question.answer = trimAll(this.question.answer);
       this.question.question_lowercase = this.question.question.toLowerCase();
 
       this.warningEmpty = false;
@@ -103,10 +102,11 @@ export default {
     async onQuestionChanged(){
       this.warningEmpty = false;
 
+      //stop detecting for questions if editing
       if (this.question.key)
         return;
 
-      let question = this.trimAll(this.question.question).toLowerCase();
+      let question = trimAll(this.question.question).toLowerCase();
       let questionFound = '';
 
       if (question === '') {
@@ -128,11 +128,6 @@ export default {
     setQuestion(question) {
       this.question = question;
     },
-
-    trimAll(text){
-      return text.replace(/\s+/g,' ')
-          .replace(/^\s+|\s+$/,'');
-    }
   }
 }
 </script>
@@ -141,14 +136,6 @@ export default {
 .leftBar {
   height: 100%;
   background: $color-background;
-}
-
-.warning {
-  font-size: 14px;
-  line-height: 24px;
-  border-radius: 40px;
-  padding: 7px 20px;
-  text-align: center;
 }
 
 

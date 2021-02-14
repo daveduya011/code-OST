@@ -27,7 +27,14 @@
           <i class="bi bi-pencil-square edit-icon"></i>
         </button>
       </div>
+
+      <button type="button" class="btn-trash btn"
+              data-bs-toggle="modal"
+              data-bs-target="#deleteModal">
+        <i class="bi bi-trash"></i>
+      </button>
     </div>
+    <ConfirmDelete @confirmDelete="deleteQuestion"></ConfirmDelete>
     <EditAnswer
         :question="displayedQuestion"></EditAnswer>
     </div>
@@ -37,10 +44,11 @@
 import TextFill from 'textfilljs'
 import { ref, watchEffect, onBeforeUpdate } from 'vue'
 import EditAnswer from "@/components/EditAnswer";
+import ConfirmDelete from "@/components/ConfirmDelete";
 
 export default {
   name: "QuestionDisplay",
-  components: {EditAnswer},
+  components: {ConfirmDelete, EditAnswer},
   inject: ["store"],
   computed: {
     displayedQuestion() {
@@ -48,8 +56,8 @@ export default {
     }
   },
   methods: {
-    showEditDialogue(){
-      
+    deleteQuestion(){
+      this.store.deleteQuestion(this.displayedQuestion);
     }
   },
   setup(){
@@ -83,8 +91,9 @@ export default {
 
 <style scoped lang="scss">
 .questionDisplay {
-  height: 80%;
+  height: 90%;
   padding: 6vw;
+  position: relative;
 }
 .alreadyAnsweredTxt {
   font-size: 18px;
@@ -167,6 +176,13 @@ export default {
   .alreadyAnsweredTxt {
     color: $color-label;
   }
+}
+.btn-trash {
+  position: absolute;
+  right: 20px;
+  bottom: 40px;
+  font-size: 26px;
+  color: $error;
 }
 
 </style>

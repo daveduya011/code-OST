@@ -15,6 +15,12 @@ export default {
         store.reset();
       }
     }
+  },
+  mounted() {
+    // disable right click
+    window.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+    }, false);
   }
 }
 </script>
