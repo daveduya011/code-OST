@@ -11,7 +11,7 @@
     </div>
 
     <div class="list">
-      <div v-for="question in Questions"
+      <div v-for="question in answerList"
            :key="question.key"
            :class="['list-item',
            'card-body', { isActive: activeQuestion === question },
@@ -30,22 +30,26 @@ export default {
   name: "AnswerList",
   data() {
     return {
-      Questions: [],
     }
   },
   computed: {
     activeQuestion() {
       return this.store.question;
+    },
+    answerList() {
+      return this.store.answerList;
     }
   },
   inject: ['store'],
   emits: ['displayedQuestionChanged'],
   created() {
     this.store.getQuestions().orderBy("timestamp","desc").onSnapshot(snapshot => {
-      this.Questions = [];
+      let questions = [];
       snapshot.forEach(result => {
-        this.Questions.push(result.data());
+        questions.push(result.data());
       });
+      this.store.defaultAnswerList = questions;
+      this.store.changeAnswerList(questions);
     })
   },
   methods : {

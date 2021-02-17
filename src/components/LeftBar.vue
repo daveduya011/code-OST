@@ -2,8 +2,9 @@
   <div class="leftBar">
 
     <div class="pastedImgContainer" v-if="pastedImg">
-      <img id="pastedImage" :src="pastedImg.src" />
+      <img id="pastedImage" :src="pastedImg.src"/>
       <i class="bi bi-x-circle" @click="pastedImg = null"></i>
+      <Loading v-if="isImgLoading"></Loading>
     </div>
     <div class="pastedImgContainer" v-else-if="question.pastedImg">
       <img :src="question.pastedImg"/>
@@ -57,10 +58,11 @@ import firebase from 'firebase/app';
 import TextArea from "@/components/TextArea";
 import {trimAll} from "@/modules/methods";
 import {retrieveImageFromClipboardAsBlob} from "@/modules/methods";
+import Loading from "@/views/Loading";
 
 export default {
   name: "LeftBar",
-  components: {TextArea},
+  components: {Loading, TextArea},
   data() {
     return {
       question: {
@@ -72,6 +74,7 @@ export default {
       warningEmpty: false,
       inputQuestion: null,
       pastedImg: null,
+      isImgLoading: false,
     };
   },
   inject: ['store'],
@@ -110,10 +113,12 @@ export default {
 
       // manage pasted image
       if (this.pastedImg) {
+        this.isImgLoading = true;
         this.store.uploadImage(this.pastedImg.blob, collection.id).then(snapshot => {
           this.pastedImg = null;
           snapshot.ref.getDownloadURL().then(value => {
             collection.update("pastedImg", value);
+            this.isImgLoading = false;
           });
         });
       }
@@ -129,9 +134,9 @@ export default {
         return;
 
       let question = trimAll(this.question.question).toLowerCase();
-      let questionFound = '';
 
       if (question === '') {
+        this.store.reloadAnswerList();
         this.store.changeQuestion(null);
         return;
       }
@@ -140,10 +145,18 @@ export default {
       let collection = this.store.getQuestions();
       let query = await collection.where('question_lowercase', '==', question).get();
 
+      let questions = [];
       query.forEach(result => {
-        questionFound = result.data();
+        questions.push(result.data());
       })
-      this.store.changeQuestion(questionFound);
+      if (questions.length) {
+        this.store.changeAnswerList(questions);
+        this.store.changeQuestion(questions[0]);
+      } else {
+        this.store.reloadAnswerList();
+        this.store.changeQuestion('');
+      }
+
       this.$emit('displayedQuestionChanged');
     },
 
@@ -183,7 +196,7 @@ export default {
   position: relative;
   width: fit-content;
   img {
-    max-width: 100%;
+    max-width: 90%;
     max-height: 150px;
     margin: 0px 20px;
     border-radius: 20px;

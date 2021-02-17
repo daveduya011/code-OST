@@ -8,6 +8,8 @@ export const store = reactive({
     isExistingProject: false,
     isLoading: true,
     question: null,
+    answerList: null,
+    defaultAnswerList: null,
     setProjectID : async (projectID) => {
         store.projectID = projectID;
         let project = await store.getProject().get();
@@ -52,6 +54,12 @@ export const store = reactive({
         del.then(() => {
             store.changeQuestion(null);
         });
+    },
+    changeAnswerList(list) {
+        store.answerList = list;
+    },
+    reloadAnswerList(){
+        store.changeAnswerList(store.defaultAnswerList);
     },
     uploadImage: (image, name) => {
         return storage.child(store.projectID).child(name).put(image);
