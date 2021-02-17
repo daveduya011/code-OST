@@ -15,6 +15,12 @@
         <i class="bi bi-check2 checkmark"></i> Already answered
         <div class="unsureTxt" v-if="displayedQuestion.isUnsure">but not sure tho.</div>
       </div>
+      <div class="pastedImgContainer mb-3" v-if="displayedQuestion.pastedImg">
+        <img :src="displayedQuestion.pastedImg"
+          @click="zoomImage"
+        />
+        <ZoomModal :img="displayedQuestion.pastedImg" ref="zoomModal"></ZoomModal>
+      </div>
       <div class="question" ref="questionEl">
         <span>{{ displayedQuestion.question }}</span>
       </div>
@@ -49,10 +55,11 @@ import { ref, watchEffect, onBeforeUpdate } from 'vue'
 import EditAnswer from "@/components/EditAnswer";
 import ConfirmDelete from "@/components/ConfirmDelete";
 import QuestionIsChangedModal from "@/components/QuestionIsChangedModal";
+import ZoomModal from "@/components/ZoomModal";
 
 export default {
   name: "QuestionDisplay",
-  components: {QuestionIsChangedModal, ConfirmDelete, EditAnswer},
+  components: {ZoomModal, QuestionIsChangedModal, ConfirmDelete, EditAnswer},
   data(){
     return {
       snapshot: null,
@@ -92,6 +99,9 @@ export default {
     },
     onEditSubmit(){
       this.isYouEditing = true;
+    },
+    zoomImage() {
+      this.$refs.zoomModal.showModal();
     }
   },
   setup(){
@@ -153,7 +163,7 @@ export default {
 .question {
   line-height: 1.5em;
   font-weight: bold;
-  height: 200px;
+  height: 22vh;
   @include media-breakpoint-down(md) {
     height: auto;
   }
@@ -217,6 +227,17 @@ export default {
   bottom: 40px;
   font-size: 26px;
   color: $error;
+}
+
+.pastedImgContainer {
+  position: relative;
+  width: fit-content;
+  cursor: zoom-in;
+  img {
+    max-width: 100%;
+    max-height: 120px;
+    border-radius: 20px;
+  }
 }
 
 </style>

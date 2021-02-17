@@ -1,5 +1,5 @@
 import { reactive } from 'vue';
-import { db } from '@/firebaseDb'
+import { db, storage } from '@/firebaseDb'
 import firebase from "firebase/app";
 
 export const store = reactive({
@@ -53,6 +53,9 @@ export const store = reactive({
             store.changeQuestion(null);
         });
     },
+    uploadImage: (image, name) => {
+        return storage.child(store.projectID).child(name).put(image);
+    },
     reset: ()=>{
         store.projectID = null;
         store.projectName = '';
@@ -62,31 +65,5 @@ export const store = reactive({
     }
 });
 
-export const retrieveImageFromClipboardAsBlob = (pasteEvent, callback) => {
-    if(pasteEvent.clipboardData === false){
-        if(typeof(callback) == "function"){
-            callback(undefined);
-        }
-    }
-
-    const items = pasteEvent.clipboardData.items;
-
-    if(items === undefined){
-        if(typeof(callback) == "function"){
-            callback(undefined);
-        }
-    }
-
-    for (let i = 0; i < items.length; i++) {
-        // Skip content if not image
-        if (items[i].type.indexOf("image") === -1) continue;
-        // Retrieve image on clipboard as blob
-        let blob = items[i].getAsFile();
-
-        if(typeof(callback) == "function"){
-            callback(blob);
-        }
-    }
-}
 
 export default { store }

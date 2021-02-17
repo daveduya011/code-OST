@@ -1,16 +1,25 @@
 <template>
   <div class="leftBar">
-    <img id="pastedImage" :src="imageSRC" v-if="imageSRC"/>
+
+    <div class="pastedImgContainer" v-if="pastedImg">
+      <img id="pastedImage" :src="pastedImg.src" />
+      <i class="bi bi-x-circle" @click="pastedImg = null"></i>
+    </div>
+    <div class="pastedImgContainer" v-else-if="question.pastedImg">
+      <img :src="question.pastedImg"/>
+      <i class="bi bi-x-circle" @click="question.pastedImg = null; pastedImg = null"></i>
+    </div>
+
     <form>
-      <div class="form-group px-4 pt-4 pb-2">
+      <div class="form-group px-4 pt-2 pb-2">
         <label for="inputQuestion">Question</label>
         <TextArea class="form-control" id="inputQuestion" rows="3"
                 :model-value="question.question"
                 @update:model-value="question.question = $event"
                 @input="onQuestionChanged"
+                @paste="onPaste($event)"
         ></TextArea>
       </div>
-<!--      @paste="onPaste($event)"-->
 
 
       <div class="form-group px-4">
@@ -47,7 +56,7 @@
 import firebase from 'firebase/app';
 import TextArea from "@/components/TextArea";
 import {trimAll} from "@/modules/methods";
-import {retrieveImageFromClipboardAsBlob} from "@/modules/store";
+import {retrieveImageFromClipboardAsBlob} from "@/modules/methods";
 
 export default {
   name: "LeftBar",
@@ -58,11 +67,11 @@ export default {
         question: '',
         answer: '',
         isUnsure: false,
-        timestamp: Date()
+        timestamp: Date(),
       },
       warningEmpty: false,
       inputQuestion: null,
-      imageSRC: null,
+      pastedImg: null,
     };
   },
   inject: ['store'],
@@ -98,6 +107,17 @@ export default {
         this.question = {};
         this.searched = 'none';
       });
+
+      // manage pasted image
+      if (this.pastedImg) {
+        this.store.uploadImage(this.pastedImg.blob, collection.id).then(snapshot => {
+          this.pastedImg = null;
+          snapshot.ref.getDownloadURL().then(value => {
+            collection.update("pastedImg", value);
+          });
+        });
+      }
+
       this.$emit('onSubmit');
     },
 
@@ -137,13 +157,14 @@ export default {
         if(imageBlob){
           let img = new Image();
 
-          // Crossbrowser support for URL
+          // Cross-browser support for URL
           let URLObj = window.URL || window.webkitURL;
 
           // Creates a DOMString containing a URL representing the object given in the parameter
           // namely the original Blob
           img.src = URLObj.createObjectURL(imageBlob);
-          this.imageSRC = img.src;
+          img.blob = imageBlob;
+          this.pastedImg = img;
         }
       });
     }
@@ -155,12 +176,27 @@ export default {
 .leftBar {
   height: 100%;
   background: $color-background;
+  padding-top: 10px;
 }
 
-#pastedImage {
-  max-width: 100%;
-  max-height: 200px;
-  padding: 20px 20px 5px 20px;
+.pastedImgContainer {
+  position: relative;
+  width: fit-content;
+  img {
+    max-width: 100%;
+    max-height: 150px;
+    margin: 0px 20px;
+    border-radius: 20px;
+  }
+  i {
+    position: absolute;
+    right: 30px;
+    top: 2px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #fff;
+    text-shadow: 0px 0px 8px $primary-dark;
+  }
 }
 
 
