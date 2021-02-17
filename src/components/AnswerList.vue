@@ -2,18 +2,20 @@
   <div class="answerList h-100">
     <div class="header px-4 pt-4 pb-2">
       <h1>Answer List</h1>
-      <div class="input-group mb-3">
-        <span class="input-group-text">
-          <i class="bi bi-search"></i>
-        </span>
-        <input type="search" class="form-control" placeholder="Search" aria-label="Search">
-      </div>
+<!--      <div class="input-group mb-3">-->
+<!--        <span class="input-group-text">-->
+<!--          <i class="bi bi-search"></i>-->
+<!--        </span>-->
+<!--        <input type="search" class="form-control" placeholder="Search" aria-label="Search">-->
+<!--      </div>-->
     </div>
 
     <div class="list">
       <div v-for="question in Questions"
            :key="question.key"
-           :class="['list-item', 'card-body', { isActive: activeQuestion === question }]"
+           :class="['list-item',
+           'card-body', { isActive: activeQuestion === question },
+           { isUnsure: question.isUnsure }]"
            @click="selectQuestion(question)"
       >
         <div class="question card-text">{{ question.question }}</div>
@@ -83,6 +85,18 @@ export default {
 
     .answer, .question {
       word-break: break-word;
+    }
+
+
+    &.isUnsure {
+      background-color: $error-lighter;
+      .answer {
+        color: $error-dark;
+      }
+
+      &.isActive {
+        background: $error-light;
+      }
     }
   }
 }

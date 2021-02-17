@@ -62,4 +62,31 @@ export const store = reactive({
     }
 });
 
+export const retrieveImageFromClipboardAsBlob = (pasteEvent, callback) => {
+    if(pasteEvent.clipboardData === false){
+        if(typeof(callback) == "function"){
+            callback(undefined);
+        }
+    }
+
+    const items = pasteEvent.clipboardData.items;
+
+    if(items === undefined){
+        if(typeof(callback) == "function"){
+            callback(undefined);
+        }
+    }
+
+    for (let i = 0; i < items.length; i++) {
+        // Skip content if not image
+        if (items[i].type.indexOf("image") === -1) continue;
+        // Retrieve image on clipboard as blob
+        let blob = items[i].getAsFile();
+
+        if(typeof(callback) == "function"){
+            callback(blob);
+        }
+    }
+}
+
 export default { store }

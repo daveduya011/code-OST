@@ -1,14 +1,16 @@
 <template>
   <div class="leftBar">
-
+    <img id="pastedImage" :src="imageSRC" v-if="imageSRC"/>
     <form>
       <div class="form-group px-4 pt-4 pb-2">
         <label for="inputQuestion">Question</label>
         <TextArea class="form-control" id="inputQuestion" rows="3"
                 :model-value="question.question"
                 @update:model-value="question.question = $event"
-                @input="onQuestionChanged"></TextArea>
+                @input="onQuestionChanged"
+        ></TextArea>
       </div>
+<!--      @paste="onPaste($event)"-->
 
 
       <div class="form-group px-4">
@@ -45,6 +47,7 @@
 import firebase from 'firebase/app';
 import TextArea from "@/components/TextArea";
 import {trimAll} from "@/modules/methods";
+import {retrieveImageFromClipboardAsBlob} from "@/modules/store";
 
 export default {
   name: "LeftBar",
@@ -57,7 +60,9 @@ export default {
         isUnsure: false,
         timestamp: Date()
       },
-      warningEmpty: false
+      warningEmpty: false,
+      inputQuestion: null,
+      imageSRC: null,
     };
   },
   inject: ['store'],
@@ -125,7 +130,24 @@ export default {
     setQuestion(question) {
       this.question = question;
     },
-  }
+
+    onPaste(e){
+      retrieveImageFromClipboardAsBlob(e, (imageBlob) => {
+        // If there's an image, display it in the canvas
+        if(imageBlob){
+          let img = new Image();
+
+          // Crossbrowser support for URL
+          let URLObj = window.URL || window.webkitURL;
+
+          // Creates a DOMString containing a URL representing the object given in the parameter
+          // namely the original Blob
+          img.src = URLObj.createObjectURL(imageBlob);
+          this.imageSRC = img.src;
+        }
+      });
+    }
+  },
 }
 </script>
 
@@ -133,6 +155,12 @@ export default {
 .leftBar {
   height: 100%;
   background: $color-background;
+}
+
+#pastedImage {
+  max-width: 100%;
+  max-height: 200px;
+  padding: 20px 20px 5px 20px;
 }
 
 

@@ -20,6 +20,9 @@ export default {
       element.style.height = "auto";
       element.style.height = `${element.scrollHeight+8}px`;
     },
+    get(){
+      return this.$refs.txtArea;
+    }
   }
 }
 </script>
